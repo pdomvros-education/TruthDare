@@ -935,6 +935,43 @@
             animation: miniBurst 0.9s ease-out forwards;
         }
 
+
+        /* --- Golden / golden-red flame effects --- */
+        .gold-flame {
+            display: inline-block;
+            -webkit-text-fill-color: initial;
+            background: none;
+            filter: sepia(1) saturate(4.5) hue-rotate(345deg) brightness(1.22) contrast(1.08);
+            text-shadow:
+                0 0 8px rgba(255, 214, 10, 0.95),
+                0 0 18px rgba(255, 159, 28, 0.85),
+                0 0 30px rgba(220, 38, 38, 0.75),
+                0 6px 0 rgba(0, 0, 0, 0.22);
+            transform-origin: center bottom;
+            animation: goldFlameFlash 0.95s ease-in-out infinite alternate;
+        }
+
+        h1 .gold-flame {
+            margin: 0 0.08em;
+            filter: sepia(1) saturate(5) hue-rotate(342deg) brightness(1.28) contrast(1.08);
+        }
+
+        .modal-emoji-ring .gold-flame {
+            filter: sepia(1) saturate(5) hue-rotate(342deg) brightness(1.25) contrast(1.08);
+            text-shadow:
+                0 0 8px rgba(255, 215, 0, 0.95),
+                0 0 18px rgba(255, 89, 0, 0.9),
+                0 0 26px rgba(239, 68, 68, 0.75);
+        }
+
+        .mini-burst.flame-burst {
+            filter: sepia(1) saturate(5) hue-rotate(342deg) brightness(1.25) contrast(1.08);
+            text-shadow:
+                0 0 8px rgba(255, 215, 0, 0.95),
+                0 0 18px rgba(255, 136, 0, 0.9),
+                0 0 26px rgba(220, 38, 38, 0.75);
+        }
+
         @keyframes bgPulse {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -1032,6 +1069,25 @@
             100% { transform: translate(var(--dx), var(--dy)) scale(1.4) rotate(280deg); opacity: 0; }
         }
 
+
+        @keyframes goldFlameFlash {
+            0% {
+                transform: translateY(0) scale(1) rotate(-2deg);
+                opacity: 0.88;
+                filter: sepia(1) saturate(4.2) hue-rotate(348deg) brightness(1.12) contrast(1.05);
+            }
+            45% {
+                transform: translateY(-2px) scale(1.09) rotate(2deg);
+                opacity: 1;
+                filter: sepia(1) saturate(5.8) hue-rotate(338deg) brightness(1.42) contrast(1.12);
+            }
+            100% {
+                transform: translateY(1px) scale(0.98) rotate(-1deg);
+                opacity: 0.95;
+                filter: sepia(1) saturate(5) hue-rotate(355deg) brightness(1.25) contrast(1.1);
+            }
+        }
+
         @media (max-width: 500px) {
             .intro-badge { font-size: 0.9rem; }
             .intro-subtitle, .game-subtitle { border-radius: 22px; font-size: 0.95rem; }
@@ -1086,7 +1142,7 @@
     </div>
 
     <div id="game-page">
-        <h1 id="game-title">🔥 Truth or Dare 🔥</h1>
+        <h1 id="game-title"><span class="gold-flame" aria-hidden="true">🔥</span> Truth or Dare <span class="gold-flame" aria-hidden="true">🔥</span></h1>
         <p class="game-subtitle" id="game-subtitle">Choose a mode, pick a number, and let the chaos begin.</p>
 
         <div class="main-layout">
@@ -1114,7 +1170,7 @@
 
     <div id="modal">
         <div class="modal-content">
-            <div class="modal-emoji-ring" aria-hidden="true">✨ 🎲 🔥 💬 🎉</div>
+            <div class="modal-emoji-ring" aria-hidden="true">✨ 🎲 <span class="gold-flame">🔥</span> 💬 🎉</div>
             <div id="challenge-type">Truth</div>
             <div id="challenge-text">Sample Text</div>
             <button class="close-btn" id="modal-close-btn" onclick="closeModal()">Challenge complete! ✨</button>
@@ -1134,7 +1190,7 @@
     // UI Dictionaries
     const ui = {
         en: {
-            title: "🔥 Truth or Dare: Class 1-30 🔥",
+            title: "🔥 Truth or Dare 🔥",
             introTitle: "Truth or Dare",
             introBadge: "🎓 End-of-Year Bash Edition 🎉",
             introSubtitle: "Spin. Pick. Laugh. Keep the class energy high.",
@@ -1152,7 +1208,7 @@
             homeConfirm: "Are you sure you want to go back to the start? The board will be reset!"
         },
         gr: {
-            title: "🔥 Θάρρος ή Αλήθεια: Τάξη 1-30 🔥",
+            title: "🔥 Θάρρος ή Αλήθεια 🔥",
             introTitle: "Θάρρος ή Αλήθεια",
             introBadge: "🎓 Έκδοση Τέλους Χρονιάς 🎉",
             introSubtitle: "Γύρνα. Διάλεξε. Γέλα. Κράτα την ενέργεια της τάξης ψηλά.",
@@ -1180,6 +1236,25 @@
             .replace(/[\u0300-\u036f]/g, '')
             .replace(/ς/g, 'σ')
             .toUpperCase();
+    }
+
+
+    function escapeHTML(text) {
+        return text.replace(/[&<>"]/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;'
+        }[char]));
+    }
+
+    function goldenFlameHTML(text) {
+        return escapeHTML(text).replaceAll('🔥', '<span class="gold-flame" aria-hidden="true">🔥</span>');
+    }
+
+    function setGoldenFlameTitle(id, text) {
+        const element = document.getElementById(id);
+        if (element) element.innerHTML = goldenFlameHTML(text);
     }
     
     // English Data
@@ -1330,7 +1405,7 @@
         }
 
         // Apply UI text
-        document.getElementById('game-title').innerText = ui[selectedLang].title;
+        setGoldenFlameTitle('game-title', ui[selectedLang].title);
         document.getElementById('game-subtitle').innerText = ui[selectedLang].subtitle;
         document.getElementById('wheel-step-label').innerText = ui[selectedLang].wheelStep;
         document.getElementById('board-step-label').innerText = ui[selectedLang].boardStep;
@@ -1484,8 +1559,9 @@
         const y = rect.top + rect.height / 2;
         for (let i = 0; i < 8; i++) {
             const burst = document.createElement('span');
-            burst.className = 'mini-burst';
-            burst.textContent = emojis[i % emojis.length];
+            const emoji = emojis[i % emojis.length];
+            burst.className = emoji === '🔥' ? 'mini-burst flame-burst' : 'mini-burst';
+            burst.textContent = emoji;
             burst.style.left = `${x}px`;
             burst.style.top = `${y}px`;
             burst.style.setProperty('--dx', `${(Math.random() - 0.5) * 180}px`);
