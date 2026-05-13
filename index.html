@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth or Dare: End of Year Bash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Fredoka:wght@400;500;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
+            --primary: #f43f5e;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body { 
+            /* Default to Fredoka */
+            font-family: 'Fredoka', sans-serif; 
+            background: var(--bg-gradient); 
+            color: white; 
+            text-align: center; 
+            margin: 0; 
+            padding: 20px 15px 100px 15px; /* Bottom padding for footer */
+            min-height: 100vh;
+            overflow-x: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Class applied via JS when Greek is selected */
+        body.lang-gr {
+            font-family: 'Comfortaa', sans-serif;
+        }
+
+        /* --- Corner Elements (Home & Logo) --- */
+        .corner-logo {
+            position: absolute; 
+            top: 20px;
+            right: 20px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: contain; 
+            background: transparent;
+            z-index: 1000;
+            border: 3px solid var(--glass-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 3px solid var(--glass-border);
+            color: white;
+            font-size: 2.2rem;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            display: none; /* Hidden on intro page */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            background: var(--accent);
+            border-color: white;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        h1 { 
+            font-size: 2.2rem; 
+            font-weight: 600;
+            margin-bottom: 30px;
+            background: -webkit-linear-gradient(45deg, var(--primary), #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.4));
+        }
+
+        /* --- Intro Page --- */
+        #intro-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .intro-img {
+            max-width: 450px; 
+            max-height: 450px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .lang-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .lang-btn {
+            padding: 10px 25px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            border: 2px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: white;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .lang-btn:hover, .lang-btn.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(244, 63, 94, 0.5);
+            transition: all 0.3s ease;
+            display: none; 
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(244, 63, 94, 0.7);
+        }
+
+        /* --- Game Page --- */
+        #game-page {
+            display: none; 
+            flex-grow: 1;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .main-layout { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 40px; 
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- The Wheel Section --- */
+        .wheel-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #wheel-container { 
+            position: relative; 
+            width: 300px; 
+            height: 300px; 
+            margin-bottom: 25px; 
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
+        }
+
+        #canvas { 
+            width: 100%; 
+            height: 100%; 
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); 
+            border-radius: 50%;
+            border: 4px solid white;
+        }
+
+        #pointer { 
+            position: absolute; 
+            top: -15px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent; 
+            border-right: 15px solid transparent; 
+            border-top: 30px solid white; 
+            z-index: 10; 
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        #spin-btn { 
+            padding: 12px 30px; 
+            font-size: 1.2rem; 
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer; 
+            background: linear-gradient(45deg, var(--secondary), var(--accent)); 
+            border: none; 
+            color: white; 
+            border-radius: 50px; 
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #spin-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        #spin-btn:active {
+            transform: translateY(2px);
+        }
+
+        #student-display {
+            font-size: 1.5rem;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* --- The Board Section --- */
+        .board-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mode-selector { 
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50px;
+            padding: 5px;
+            margin-bottom: 20px; 
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .mode-btn { 
+            padding: 10px 30px; 
+            font-size: 1.1rem; 
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer; 
+            border: none; 
+            background: transparent; 
+            color: rgba(255,255,255,0.5); 
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active { 
+            background: white; 
+            color: #0f172a; 
+            box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(6, 1fr); 
+            gap: 10px; 
+            max-width: 600px; 
+        }
+
+        .square { 
+            width: 65px; 
+            height: 65px; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); 
+            border: 1px solid var(--glass-border);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.4rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            border-radius: 15px; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .square:hover { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: translateY(-5px) scale(1.1) rotate(3deg); 
+            border-color: transparent;
+            box-shadow: 0 10px 20px rgba(244, 63, 94, 0.4);
+            z-index: 2;
+        }
+
+        .square.used { 
+            background: rgba(0,0,0,0.4) !important; 
+            color: rgba(255,255,255,0.2);
+            border-color: transparent;
+            cursor: not-allowed; 
+            transform: none !important;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- Modal (3D Flip Animation) --- */
+        #modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.7); 
+            backdrop-filter: blur(8px);
+            z-index: 100; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px; 
+            animation: fadeIn 0.3s ease;
+            perspective: 1000px; 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content { 
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); 
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            color: white; 
+            padding: 35px 25px; 
+            border-radius: 25px; 
+            max-width: 500px; 
+            width: 100%;
+            text-align: center;
+            transform-style: preserve-3d;
+            animation: flipIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes flipIn {
+            0% { transform: rotateY(-90deg) scale(0.8); opacity: 0; }
+            100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+        }
+
+        #challenge-type { 
+            font-size: 1.3rem; 
+            font-weight: 600; 
+            margin-bottom: 15px; 
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
+
+        #challenge-text { 
+            font-size: 1.5rem; 
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 30px; 
+        }
+
+        .close-btn { 
+            padding: 12px 30px; 
+            font-size: 1.1rem; 
+            font-family: inherit;
+            font-weight: 500;
+            background: white; 
+            color: #0f172a; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+        }
+
+        .close-btn:hover {
+            transform: scale(1.05);
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        /* --- Footer --- */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 400;
+            z-index: 50;
+            line-height: 1.4;
+        }
+
+        /* --- MEDIA QUERIES FOR RESPONSIVENESS --- */
+
+        /* Smartboards & Large Screens */
+        @media (min-width: 1200px) {
+            h1 { font-size: 3rem; margin-bottom: 40px; }
+            #wheel-container { width: 400px; height: 400px; }
+            .grid { gap: 15px; }
+            .square { width: 85px; height: 85px; font-size: 1.8rem; }
+            .modal-content { max-width: 700px; padding: 50px; }
+            #challenge-text { font-size: 2.2rem; }
+            #spin-btn { font-size: 1.5rem; padding: 15px 40px;}
+            .corner-logo { width: 110px; height: 110px; top: 30px; right: 30px; }
+            .home-btn { width: 110px; height: 110px; top: 30px; left: 30px; font-size: 2.8rem; }
+        }
+
+        /* Tablets & Smaller Laptops */
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: repeat(5, 1fr); }
+            .main-layout { flex-direction: column; gap: 30px; }
+        }
+
+        /* Mobile Phones */
+        @media (max-width: 500px) {
+            body { padding-bottom: 120px; } 
+            h1 { font-size: 1.6rem; margin-bottom: 20px; }
+            #wheel-container { width: 250px; height: 250px; }
+            .grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+            .square { width: 55px; height: 55px; font-size: 1.2rem; border-radius: 10px; }
+            .modal-content { padding: 25px 20px; }
+            #challenge-text { font-size: 1.2rem; }
+            .mode-btn { padding: 8px 20px; font-size: 1rem; }
+            #spin-btn { font-size: 1.1rem; padding: 10px 25px;}
+            footer { font-size: 0.8rem; }
+            .corner-logo { width: 60px; height: 60px; top: 15px; right: 15px; border-width: 2px;}
+            .home-btn { width: 60px; height: 60px; top: 15px; left: 15px; font-size: 1.5rem; border-width: 2px;}
+            .intro-img { max-width: 250px; max-height: 250px; }
+        }
+
+
+        /* --- Youthful neon remix layer --- */
+        :root {
+            --bg-gradient: radial-gradient(circle at 15% 20%, rgba(255, 61, 113, 0.42), transparent 28%),
+                           radial-gradient(circle at 85% 15%, rgba(0, 229, 255, 0.35), transparent 26%),
+                           radial-gradient(circle at 30% 90%, rgba(255, 230, 109, 0.28), transparent 28%),
+                           linear-gradient(135deg, #16002b 0%, #111827 38%, #031b3f 68%, #240046 100%);
+            --primary: #ff3d71;
+            --secondary: #7c3aed;
+            --accent: #00e5ff;
+            --yellow: #ffe66d;
+            --lime: #8cff66;
+            --orange: #ff9f1c;
+            --ink: #111827;
+            --glass-bg: rgba(255, 255, 255, 0.14);
+            --glass-border: rgba(255, 255, 255, 0.34);
+        }
+
+        body {
+            position: relative;
+            isolation: isolate;
+            background: var(--bg-gradient);
+            background-size: 220% 220%;
+            animation: bgPulse 14s ease-in-out infinite;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: radial-gradient(circle at center, black, transparent 75%);
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(255,255,255,0.14) 1px, transparent 1.8px);
+            background-size: 28px 28px;
+            opacity: 0.45;
+            animation: starDrift 24s linear infinite;
+        }
+
+        .vibe-bg, .confetti-layer {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .vibe-bg { z-index: -1; }
+        .confetti-layer { z-index: 9999; }
+
+        .blob {
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 999px;
+            filter: blur(10px);
+            opacity: 0.48;
+            mix-blend-mode: screen;
+            animation: blobFloat 13s ease-in-out infinite alternate;
+        }
+
+        .blob-1 { left: -70px; top: 18%; background: #ff3d71; }
+        .blob-2 { right: -80px; top: 8%; background: #00e5ff; animation-delay: -4s; }
+        .blob-3 { left: 22%; bottom: -120px; background: #ffe66d; animation-delay: -7s; }
+        .blob-4 { right: 22%; bottom: -100px; background: #8cff66; animation-delay: -9s; }
+
+        .sticker {
+            position: absolute;
+            font-size: clamp(2rem, 4vw, 4.6rem);
+            opacity: 0.22;
+            text-shadow: 0 0 28px rgba(255,255,255,0.7);
+            animation: stickerFloat 8s ease-in-out infinite alternate;
+        }
+
+        .sticker-1 { left: 8%; top: 17%; animation-delay: -1s; }
+        .sticker-2 { right: 14%; top: 32%; animation-delay: -3s; }
+        .sticker-3 { left: 12%; bottom: 18%; animation-delay: -5s; }
+        .sticker-4 { right: 8%; bottom: 22%; animation-delay: -6s; }
+        .sticker-5 { left: 48%; top: 8%; animation-delay: -7s; }
+
+        .corner-logo, .home-btn {
+            border-color: rgba(255,255,255,0.55);
+            background: rgba(255,255,255,0.18);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.06), 0 18px 40px rgba(0,0,0,0.35), 0 0 30px rgba(0,229,255,0.25);
+        }
+
+        .corner-logo {
+            animation: logoPulse 3.2s ease-in-out infinite;
+        }
+
+        h1 {
+            font-family: 'Luckiest Guy', 'Fredoka', sans-serif;
+            font-size: clamp(2.4rem, 5.8vw, 5.5rem);
+            letter-spacing: 1.5px;
+            margin-top: 0.35rem;
+            margin-bottom: 14px;
+            background: linear-gradient(90deg, #fff, #ffe66d, #00e5ff, #ff3d71, #fff);
+            background-size: 250% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 6px 0 rgba(0,0,0,0.22)) drop-shadow(0 0 22px rgba(0,229,255,0.55));
+            animation: titleShine 5s linear infinite, titleBounce 2.8s ease-in-out infinite;
+        }
+
+        .intro-badge, .section-label, .progress-pill, .game-subtitle, .intro-subtitle {
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .intro-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 18px;
+            margin: 10px 0 4px;
+            border: 1px solid rgba(255,255,255,0.42);
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255,61,113,0.26), rgba(0,229,255,0.24));
+            box-shadow: 0 10px 26px rgba(0,0,0,0.24), inset 0 0 18px rgba(255,255,255,0.08);
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            animation: badgePop 0.75s cubic-bezier(.2,1.3,.3,1) both;
+        }
+
+        .intro-subtitle, .game-subtitle {
+            max-width: 650px;
+            margin: 0 auto 24px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            color: rgba(255,255,255,0.88);
+            background: rgba(17,24,39,0.26);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+        }
+
+        .intro-img {
+            max-width: min(480px, 82vw);
+            border-radius: 34px;
+            border: 4px solid rgba(255,255,255,0.38);
+            background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
+            box-shadow: 0 25px 65px rgba(0,0,0,0.38), 0 0 55px rgba(255,61,113,0.28), inset 0 0 30px rgba(255,255,255,0.09);
+            transform-origin: center;
+            animation: heroFloat 4s ease-in-out infinite;
+        }
+
+        .lang-selector {
+            padding: 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            box-shadow: inset 0 0 22px rgba(255,255,255,0.06), 0 12px 30px rgba(0,0,0,0.18);
+        }
+
+        .lang-btn, .start-btn, #spin-btn, .close-btn, .mode-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lang-btn::after, .start-btn::after, #spin-btn::after, .close-btn::after, .mode-btn::after {
+            content: "";
+            position: absolute;
+            inset: -40% -80%;
+            background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.45) 50%, transparent 65%);
+            transform: translateX(-80%);
+            transition: transform 0.65s ease;
+        }
+
+        .lang-btn:hover::after, .start-btn:hover::after, #spin-btn:hover::after, .close-btn:hover::after, .mode-btn:hover::after {
+            transform: translateX(80%);
+        }
+
+        .lang-btn {
+            background: linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+            box-shadow: 0 9px 24px rgba(0,0,0,0.2);
+        }
+
+        .lang-btn:hover, .lang-btn.selected {
+            color: #101827;
+            background: linear-gradient(135deg, var(--yellow), var(--accent));
+            box-shadow: 0 16px 35px rgba(0,229,255,0.38);
+        }
+
+        .start-btn, #spin-btn {
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border: 2px solid rgba(255,255,255,0.42);
+        }
+
+        /* Greek uppercase should appear without tonos.
+           The text is uppercased manually in JS for Greek labels. */
+        body.lang-gr .start-btn,
+        body.lang-gr #spin-btn,
+        body.lang-gr #challenge-type {
+            text-transform: none;
+        }
+
+        .start-btn {
+            background: linear-gradient(90deg, #ff3d71, #ff9f1c, #ffe66d);
+            color: #150b2d;
+            box-shadow: 0 16px 35px rgba(255,61,113,0.45), 0 0 35px rgba(255,230,109,0.26);
+            animation: slideUp 0.4s ease forwards, buttonPulse 2.2s ease-in-out infinite;
+        }
+
+        .main-layout {
+            align-items: stretch;
+        }
+
+        .wheel-section, .board-section {
+            position: relative;
+            min-width: min(100%, 360px);
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.26);
+            background: linear-gradient(145deg, rgba(255,255,255,0.16), rgba(255,255,255,0.05));
+            border-radius: 36px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.22), 0 0 40px rgba(124,58,237,0.2);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .wheel-section::before, .board-section::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            z-index: -1;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255,61,113,0.6), rgba(0,229,255,0.5), rgba(255,230,109,0.45));
+            filter: blur(15px);
+            opacity: 0.48;
+            animation: neonBreathe 3.6s ease-in-out infinite;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.28);
+            background: rgba(0,0,0,0.24);
+            color: rgba(255,255,255,0.92);
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+
+        #wheel-container {
+            filter: drop-shadow(0 0 28px rgba(0,229,255,0.42)) drop-shadow(0 14px 24px rgba(0,0,0,0.35));
+        }
+
+        #canvas {
+            border: 7px solid rgba(255,255,255,0.92);
+            box-shadow: inset 0 0 32px rgba(255,255,255,0.22), 0 0 0 12px rgba(255,255,255,0.06), 0 0 40px rgba(255,61,113,0.26);
+        }
+
+        #pointer {
+            top: -22px;
+            border-left-width: 22px;
+            border-right-width: 22px;
+            border-top-width: 42px;
+            border-top-color: var(--yellow);
+            filter: drop-shadow(0 7px 0 rgba(0,0,0,0.35)) drop-shadow(0 0 12px rgba(255,230,109,0.85));
+            animation: pointerWiggle 1.35s ease-in-out infinite;
+        }
+
+        #spin-btn {
+            background: linear-gradient(90deg, #7c3aed, #00e5ff, #8cff66);
+            color: #07111f;
+            box-shadow: 0 16px 35px rgba(0,229,255,0.34), 0 0 28px rgba(140,255,102,0.2);
+        }
+
+        body.spinning #pointer {
+            animation: pointerWiggle 0.22s ease-in-out infinite;
+        }
+
+        #student-display {
+            min-width: 220px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.06), 0 10px 24px rgba(0,0,0,0.2);
+        }
+
+        #student-display.result-pop {
+            animation: resultPop 0.8s cubic-bezier(.2,1.5,.35,1) both;
+        }
+
+        .mode-selector {
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(0,0,0,0.28);
+        }
+
+        .mode-btn {
+            color: rgba(255,255,255,0.7);
+            font-weight: 700;
+        }
+
+        .mode-btn.active {
+            color: #151029;
+            background: linear-gradient(135deg, #fff, #ffe66d);
+            box-shadow: 0 10px 22px rgba(255,230,109,0.24), inset 0 1px 0 rgba(255,255,255,0.7);
+            transform: scale(1.04);
+        }
+
+        .grid {
+            perspective: 1000px;
+        }
+
+        .square {
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.24);
+            background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.07));
+            box-shadow: 0 12px 22px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.18);
+            transform-style: preserve-3d;
+            animation: cardDrop 0.65s cubic-bezier(.2,1.3,.3,1) both;
+        }
+
+        .square::before {
+            content: "?";
+            position: absolute;
+            inset: 6px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.22);
+            border: 1px dashed rgba(255,255,255,0.16);
+            transform: translateZ(-1px);
+        }
+
+        .square:nth-child(5n+1) { background: linear-gradient(145deg, rgba(255,61,113,0.72), rgba(124,58,237,0.38)); }
+        .square:nth-child(5n+2) { background: linear-gradient(145deg, rgba(0,229,255,0.62), rgba(59,130,246,0.32)); }
+        .square:nth-child(5n+3) { background: linear-gradient(145deg, rgba(255,230,109,0.64), rgba(255,159,28,0.35)); color: #211827; }
+        .square:nth-child(5n+4) { background: linear-gradient(145deg, rgba(140,255,102,0.55), rgba(20,184,166,0.3)); color: #071827; }
+        .square:nth-child(5n) { background: linear-gradient(145deg, rgba(236,72,153,0.6), rgba(217,70,239,0.35)); }
+
+        .square:hover {
+            transform: translateY(-9px) scale(1.13) rotate(4deg) rotateX(9deg);
+            box-shadow: 0 18px 34px rgba(255,61,113,0.34), 0 0 30px rgba(0,229,255,0.28);
+        }
+
+        .square.used {
+            color: rgba(255,255,255,0.36) !important;
+            background: rgba(7,11,24,0.62) !important;
+        }
+
+        .square.used::after {
+            content: "✓";
+            position: absolute;
+            right: 8px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--lime);
+            color: #071827;
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .square.pop-used {
+            animation: cardPop 0.52s cubic-bezier(.2,1.5,.35,1) both;
+        }
+
+        .progress-pill {
+            margin-top: 18px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.24);
+            border-radius: 999px;
+            background: rgba(0,0,0,0.25);
+            color: rgba(255,255,255,0.88);
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+        }
+
+        #modal {
+            background: radial-gradient(circle at top, rgba(255,61,113,0.28), transparent 40%), rgba(4,7,18,0.78);
+        }
+
+        .modal-content {
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.32);
+            background: linear-gradient(145deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06));
+            box-shadow: 0 28px 80px rgba(0,0,0,0.48), 0 0 50px rgba(0,229,255,0.22), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+
+        .modal-content::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,230,109,0.2), transparent, rgba(0,229,255,0.18), transparent);
+            animation: modalSpin 8s linear infinite;
+        }
+
+        .modal-content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-emoji-ring {
+            margin-bottom: 12px;
+            font-size: clamp(1.3rem, 3vw, 2rem);
+            letter-spacing: 8px;
+            animation: emojiWave 2.1s ease-in-out infinite;
+        }
+
+        #challenge-type {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.32);
+            border: 1px solid rgba(255,255,255,0.24);
+            text-transform: uppercase;
+            letter-spacing: 2.4px;
+            color: var(--yellow) !important;
+            box-shadow: inset 0 0 18px rgba(255,255,255,0.06);
+        }
+
+        #challenge-text {
+            font-size: clamp(1.35rem, 3.6vw, 2.45rem);
+            font-weight: 700;
+            text-shadow: 0 4px 18px rgba(0,0,0,0.25);
+        }
+
+        .close-btn {
+            background: linear-gradient(90deg, #fff, #ffe66d, #00e5ff);
+            color: #111827;
+            font-weight: 800;
+            box-shadow: 0 14px 30px rgba(0,229,255,0.22);
+        }
+
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.14);
+            background: rgba(6, 8, 23, 0.72);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.22);
+        }
+
+        .confetti {
+            position: absolute;
+            top: -24px;
+            width: 10px;
+            height: 18px;
+            border-radius: 4px;
+            animation: confettiFall 1.7s ease-in forwards;
+            box-shadow: 0 0 10px rgba(255,255,255,0.35);
+        }
+
+        .mini-burst {
+            position: fixed;
+            z-index: 9998;
+            pointer-events: none;
+            font-size: 1.45rem;
+            animation: miniBurst 0.9s ease-out forwards;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes starDrift {
+            from { background-position: 0 0; }
+            to { background-position: 160px 220px; }
+        }
+
+        @keyframes blobFloat {
+            from { transform: translate3d(0,0,0) scale(1); }
+            to { transform: translate3d(40px,-35px,0) scale(1.18); }
+        }
+
+        @keyframes stickerFloat {
+            from { transform: rotate(-10deg) translateY(0) scale(1); }
+            to { transform: rotate(12deg) translateY(-24px) scale(1.12); }
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes titleShine {
+            from { background-position: 0% 50%; }
+            to { background-position: 250% 50%; }
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0) rotate(-0.4deg); }
+            50% { transform: translateY(-5px) rotate(0.4deg); }
+        }
+
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+            50% { transform: translateY(-13px) rotate(1.5deg); }
+        }
+
+        @keyframes badgePop {
+            from { transform: translateY(10px) scale(0.84); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-2px) scale(1.025); }
+        }
+
+        @keyframes neonBreathe {
+            0%, 100% { opacity: 0.34; }
+            50% { opacity: 0.66; }
+        }
+
+        @keyframes pointerWiggle {
+            0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+            50% { transform: translateX(-50%) rotate(5deg); }
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.85); }
+            45% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes cardDrop {
+            0% { opacity: 0; transform: translateY(22px) rotateX(-40deg) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); }
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(1); }
+            55% { transform: scale(1.22) rotate(-5deg); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes modalSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes emojiWave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(115vh) rotate(760deg); opacity: 0; }
+        }
+
+        @keyframes miniBurst {
+            0% { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(1.4) rotate(280deg); opacity: 0; }
+        }
+
+        @media (max-width: 500px) {
+            .intro-badge { font-size: 0.9rem; }
+            .intro-subtitle, .game-subtitle { border-radius: 22px; font-size: 0.95rem; }
+            .wheel-section, .board-section { padding: 18px; border-radius: 26px; }
+            .section-label { font-size: 0.88rem; }
+            .modal-emoji-ring { letter-spacing: 4px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="vibe-bg" aria-hidden="true">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+        <span class="blob blob-3"></span>
+        <span class="blob blob-4"></span>
+        <span class="sticker sticker-1">🎉</span>
+        <span class="sticker sticker-2">⚡</span>
+        <span class="sticker sticker-3">💬</span>
+        <span class="sticker sticker-4">🎲</span>
+        <span class="sticker sticker-5">✨</span>
+    </div>
+    <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+
+    <audio id="card-audio" src="audio.mp3" preload="auto"></audio>
+    <audio id="spin-audio" src="audio2.mp3" preload="auto"></audio>
+
+    <button id="home-btn" class="home-btn" onclick="goHome()" title="Home">🏠</button>
+    <img src="logo.png" alt="Logo" class="corner-logo" onerror="this.style.display='none'">
+
+    <div id="intro-page">
+        <img src="image.png" alt="Truth or Dare" class="intro-img" onerror="this.style.display='none'">
+        <div class="intro-badge" id="intro-badge">🎓 End-of-Year Bash Edition 🎉</div>
+        <h1 id="intro-title">Truth or Dare</h1>
+        <p class="intro-subtitle" id="intro-subtitle">Spin. Pick. Laugh. Keep the class energy high.</p>
+        
+        <div class="lang-selector">
+            <button class="lang-btn" onclick="selectLanguage('en')">English</button>
+            <button class="lang-btn" onclick="selectLanguage('gr')">Ελληνικά</button>
+        </div>
+
+        <button id="start-btn" class="start-btn" onclick="enterGame()">Enter</button>
+    </div>
+
+    <div id="game-page">
+        <h1 id="game-title">🔥 Truth or Dare 🔥</h1>
+        <p class="game-subtitle" id="game-subtitle">Choose a mode, pick a number, and let the chaos begin.</p>
+
+        <div class="main-layout">
+            <div class="wheel-section">
+                <div class="section-label" id="wheel-step-label">1️⃣ Spin for a student</div>
+                <div id="wheel-container">
+                    <div id="pointer"></div>
+                    <canvas id="canvas" width="400" height="400"></canvas>
+                </div>
+                <button id="spin-btn" onclick="spinWheel()">Spin the wheel</button>
+                <div id="student-display">Student #: ?</div>
+            </div>
+
+            <div class="board-section">
+                <div class="section-label" id="board-step-label">2️⃣ Pick the challenge card</div>
+                <div class="mode-selector">
+                    <button class="mode-btn active" id="btn-truth" onclick="setMode('Truth')">Truth</button>
+                    <button class="mode-btn" id="btn-dare" onclick="setMode('Dare')">Dare</button>
+                </div>
+                <div class="grid" id="grid"></div>
+                <div class="progress-pill" id="progress-pill">0/30 cards opened</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <div class="modal-emoji-ring" aria-hidden="true">✨ 🎲 🔥 💬 🎉</div>
+            <div id="challenge-type">Truth</div>
+            <div id="challenge-text">Sample Text</div>
+            <button class="close-btn" id="modal-close-btn" onclick="closeModal()">Challenge complete! ✨</button>
+        </div>
+    </div>
+
+    <footer>Panagiotis Domvros, English & Drama Teacher and Trainer, Principal of 1st Middle School of Pylea</footer>
+
+<script>
+    // System Variables
+    let selectedLang = 'en';
+    let currentMode = 'Truth'; 
+    const totalStudents = 30;
+    let activeTruths = [];
+    let activeDares = [];
+
+    // UI Dictionaries
+    const ui = {
+        en: {
+            title: "🔥 Truth or Dare: Class 1-30 🔥",
+            introTitle: "Truth or Dare",
+            introBadge: "🎓 End-of-Year Bash Edition 🎉",
+            introSubtitle: "Spin. Pick. Laugh. Keep the class energy high.",
+            wheelStep: "1️⃣ Spin for a student",
+            boardStep: "2️⃣ Pick the challenge card",
+            spinBtn: "Spin the wheel",
+            studentNumPrefix: "Student #:",
+            spinningTxt: "Spinning...",
+            truthBtn: "Truth",
+            dareBtn: "Dare",
+            completeBtn: "Challenge complete! ✨",
+            enterBtn: "Enter game",
+            subtitle: "Choose a mode, pick a number, and let the chaos begin.",
+            progressTxt: "cards opened",
+            homeConfirm: "Are you sure you want to go back to the start? The board will be reset!"
+        },
+        gr: {
+            title: "🔥 Θάρρος ή Αλήθεια: Τάξη 1-30 🔥",
+            introTitle: "Θάρρος ή Αλήθεια",
+            introBadge: "🎓 Έκδοση Τέλους Χρονιάς 🎉",
+            introSubtitle: "Γύρνα. Διάλεξε. Γέλα. Κράτα την ενέργεια της τάξης ψηλά.",
+            wheelStep: "1️⃣ Γύρνα τον τροχό για μαθητή/τρια",
+            boardStep: "2️⃣ Διάλεξε την κάρτα πρόκλησης",
+            spinBtn: "Γύρνα τον τροχό",
+            studentNumPrefix: "Μαθητής/τρια #:",
+            spinningTxt: "Γυρίζει...",
+            truthBtn: "Αλήθεια",
+            dareBtn: "Θάρρος",
+            completeBtn: "Ολοκληρώθηκε! ✨",
+            enterBtn: "Έναρξη",
+            subtitle: "Διάλεξε τρόπο, άνοιξε κάρτα και άσε το παιχνίδι να ξεκινήσει.",
+            progressTxt: "κάρτες ανοίχτηκαν",
+            homeConfirm: "Είστε σίγουροι ότι θέλετε να επιστρέψετε στην αρχή; Το παιχνίδι θα μηδενιστεί!"
+        }
+    };
+
+    // For Greek UI labels that are visually ALL CAPS, remove tonos first.
+    // Example: "Αλήθεια" -> "ΑΛΗΘΕΙΑ", not "ΑΛΉΘΕΙΑ".
+    function capsLabel(text) {
+        if (selectedLang !== 'gr') return text;
+        return text
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/ς/g, 'σ')
+            .toUpperCase();
+    }
+    
+    // English Data
+    const truthsEn = [
+        "What's the most embarrassing song in your playlist?", "Who is your secret school crush?", 
+        "Have you ever faked being sick to skip a test and for which subject?", "What is the silliest thing you've ever done in your life so far?", 
+        "If you could swap lives with one teacher, who would it be?", "What's your most cringey middle school memory so far?", 
+        "What's the weirdest dream you've ever had?", "If you won 10,000€, what's the first thing you'd buy?", 
+        "Have you ever accidentally sent a text to the wrong person and what did it say?", "What is one thing you can't live without?", 
+        "What's the most childish thing you still do?", "If you were a superhero, what would your superpower be?", 
+        "What’s the worst haircut you’ve ever had?", "What is your biggest 'ick'?", 
+        "When was the time you laughed at a time when you shouldn't have and what happened?", "Who in this room would survive the longest in a zombie apocalypse?", 
+        "What’s the last lie you told?", "What’s the most embarrassing thing your parents have done?", 
+        "Do you have any hidden talents?", "What’s your favourite TikTok trend right now?", 
+        "What's the best prank you've ever pulled?", "If you were stranded on an island, which classmate would you want with you?", 
+        "What's your biggest fear?", "Have you ever talked to yourself in the mirror?", 
+        "What's the most awkward thing that's happened in this class?", "Which movie always makes you cry?", 
+        "What's your guilty pleasure TV show?", "If you could change your name, what would it be?", 
+        "What’s the first thing you’d do if you were invisible?", "What is your most used emoji?"
+    ];
+
+    const daresEn = [
+        "Do your best impression of a teacher for 30 seconds.", "Try to juggle 3 random objects from your desk.", 
+        "Talk in a country accent for the next 3 rounds.", "Strike a dramatic pose and hold it for 1 minute.", 
+        "Do 10 jumps while singing the ABCs.", "Let the person to your left redo your hair.", 
+        "Make up a 30-second rap about the cafeteria food.", "Try to touch your nose with your tongue.", 
+        "Do a slow-motion run across the classroom.", "Balance a ruler on your finger for 20 seconds.", 
+        "Mime what you did this morning until someone guesses it.", "Tell a joke. If no one laughs, do 5 pushups.", 
+        "Give a 1-minute 'TED Talk' on why pineapples belong/don't belong on pizza.", "Speak like a robot for the next 2 minutes.", 
+        "Try to draw a cat with your eyes closed on the board.", "Sing the chorus of your favourite song loudly.", 
+        "Walk like a penguin for 1 minute.", "Stare at a classmate for 30 seconds without blinking or laughing.", 
+        "Balance a book on your head and walk to the door and back.", "Act like a cat for 30 seconds (meowing included).", 
+        "Do your best 'celebrity' red carpet walk?", "Try to lick your elbow.", 
+        "Make a paper airplane and try to hit a target.", "Wear your T-shirt backward for the rest of the class.", 
+        "Talk without closing your mouth for 1 minute.", "Pretend you are a waiter and take 'orders' from 3 students.", 
+        "Do your best silly dance.", "Say the alphabet backward as fast as you can.", 
+        "Air guitar like a rock star for 30 seconds.", "Make a love confession to the person next to you for 1 minute."
+    ];
+
+    // Greek Data
+    const truthsGr = [
+        "Ποιο είναι το πιο cringe /ντροπιαστικό τραγούδι στην playlist σου;",
+        "Ποιο είναι το κρυφό σου crush στο σχολείο;",
+        "Έχεις κάνει ποτέ τον άρρωστο για να γλιτώσεις διαγώνισμα και σε ποιο μάθημα;",
+        "Ποια είναι η μεγαλύτερη βλακεία που έχεις κάνει στη ζωή σου μέχρι τώρα;",
+        "Αν μπορούσες να αλλάξεις ζωή με έναν καθηγητή, ποιος θα ήταν;",
+        "Ποια είναι η πιο cringe ανάμνησή σου από το γυμνάσιο μέχρι στιγμής;",
+        "Ποιο είναι το πιο κουλό/περίεργο όνειρο που έχεις δει ποτέ;",
+        "Αν κέρδιζες 10.000€, τι είναι το πρώτο πράγμα που θα αγόραζες;",
+        "Έχεις στείλει ποτέ κατά λάθος μήνυμα σε λάθος άτομο και τι έλεγε;",
+        "Χωρίς ποιο πράγμα δεν μπορείς να ζήσεις με τίποτα;",
+        "Ποιο είναι το πιο παιδικό πράγμα που κάνεις ακόμα;",
+        "Αν ήσουν υπερήρωας, ποια θα ήταν η υπερδύναμή σου;",
+        "Ποιο είναι το χειρότερο κούρεμα που έχεις κάνει ποτέ;",
+        "Τι σε αηδιάζει το περισσότερο;",
+        "Πότε ήταν εκείνη η φορά που έσκασες στα γέλια ενώ δεν έπρεπε και τι είχε γίνει;",
+        "Ποιος από εδώ μέσα θα επιβίωνε περισσότερο σε μια αποκάλυψη ζόμπι;",
+        "Ποιο είναι το τελευταίο ψέμα που είπες;",
+        "Ποιο είναι το πιο ντροπιαστικό πράγμα που έχουν κάνει οι γονείς σου;",
+        "Έχεις κανένα κρυφό ταλέντο;",
+        "Ποιο είναι το αγαπημένο σου TikTok trend αυτή τη στιγμή;",
+        "Ποια είναι η καλύτερη φάρσα που έχεις κάνει ποτέ;",
+        "Αν ναυαγούσες σε ένα νησί, ποιον/ποια συμμαθητή/τρια σου θα ήθελες μαζί σου;",
+        "Ποιος είναι ο μεγαλύτερός σου φόβος;",
+        "Έχεις μιλήσει ποτέ στον εαυτό σου στον καθρέφτη;",
+        "Ποιο είναι το πιο άβολο σκηνικό που έχει γίνει σε αυτή την τάξη;",
+        "Ποια ταινία σε κάνει πάντα να κλαις;",
+        "Ποια είναι η αγαπημένη σειρά σου την οποία ντρέπεσαι να παραδεχτείς ότι βλέπεις;",
+        "Αν μπορούσες να αλλάξεις το όνομά σου, ποιο θα διάλεγες;",
+        "Ποιο είναι το πρώτο πράγμα που θα έκανες αν ήσουν αόρατος/η;",
+        "Ποιο είναι το emoji που χρησιμοποιείς πιο πολύ;"
+    ];
+
+    const daresGr = [
+        "Κάνε την καλύτερη μίμηση ενός καθηγητή για 30 δευτερόλεπτα.",
+        "Προσπάθησε να κάνεις ζογκλερικά με 3 άκυρα αντικείμενα από το θρανίο σου.",
+        "Μίλα με χωριάτικη προφορά για τους επόμενους 3 γύρους.",
+        "Πάρε μια δραματική πόζα και κράτα την για 1 λεπτό.",
+        "Κάνε 10 αλματάκια ενώ τραγουδάς την Αλφαβήτα.",
+        "Άσε το άτομο στα αριστερά σου να σου φτιάξει τα μαλλιά από την αρχή.",
+        "Φτιάξε ένα 30 δευτερολέπτων ραπ για το φαγητό του κυλικείου.",
+        "Προσπάθησε να ακουμπήσεις τη μύτη σου με τη γλώσσα σου.",
+        "Τρέξε σε slow-motion κατά μήκος της τάξης.",
+        "Ισορρόπησε έναν χάρακα στο δάχτυλό σου για 20 δευτερόλεπτα.",
+        "Κάνε παντομίμα το τι έκανες το πρωί μέχρι να το βρει κάποιος.",
+        "Πες ένα ανέκδοτο. Αν δεν γελάσει κανείς, κάνε 5 pushups.",
+        "Κάνε ένα 'TED Talk' 1 λεπτού για το αν ο ανανάς πάει ή δεν πάει στην πίτσα.",
+        "Μίλα σαν ρομπότ για τα επόμενα 2 λεπτά.",
+        "Προσπάθησε να ζωγραφίσεις μια γάτα με κλειστά μάτια στον πίνακα.",
+        "Τραγούδα δυνατά το ρεφρέν του αγαπημένου σου τραγουδιού.",
+        "Περπάτα σαν πιγκουίνος για 1 λεπτό.",
+        "Κοίταξε επίμονα έναν/μία συμμαθητή/τρια σου για 30 δευτερόλεπτα χωρίς να ανοιγοκλείσεις τα μάτια σου ή να γελάσεις.",
+        "Ισορρόπησε ένα βιβλίο στο κεφάλι σου και περπάτα μέχρι την πόρτα και πίσω.",
+        "Κάνε τη γάτα για 30 δευτερόλεπτα (μαζί με τα νιαουρίσματα).",
+        "Κάνε το καλύτερό σου περπάτημα σαν 'celebrity' στο κόκκινο χαλί.",
+        "Προσπάθησε να γλείψεις τον αγκώνα σου.",
+        "Φτιάξε ένα χάρτινο αεροπλανάκι και προσπάθησε να πετύχεις έναν στόχο.",
+        "Φόρεσε το μπλουζάκι σου ανάποδα για το υπόλοιπο της ώρας.",
+        "Μίλα χωρίς να κλείσεις καθόλου το στόμα σου για 1 λεπτό.",
+        "Κάνε τον σερβιτόρο και πάρε 'παραγγελίες' από 3 συμμαθητές/τριες σου.",
+        "Κάνε τον πιο αστείο/χαζό χορό σου.",
+        "Πες την αλφαβήτα ανάποδα όσο πιο γρήγορα μπορείς.",
+        "Παίξε \"air guitar\" σαν ροκ σταρ για 30 δευτερόλεπτα.",
+        "Κάνε ερωτική εξομολόγηση στο άτομο δίπλα σου για 1 λεπτό."
+    ];
+
+    // Colors for the wheel
+    const colors = [
+        "#f43f5e", "#ec4899", "#d946ef", "#a855f7", "#8b5cf6", 
+        "#6366f1", "#3b82f6", "#0ea5e9", "#06b6d4", "#14b8a6", 
+        "#10b981", "#22c55e", "#84cc16", "#eab308", "#f59e0b", "#f97316"
+    ];
+
+    // --- Page Logic ---
+    function selectLanguage(lang) {
+        selectedLang = lang;
+        
+        // Visual selection
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
+        const clickedButton = window.event ? window.event.target : document.querySelector(`.lang-btn[onclick*="${lang}"]`);
+        if (clickedButton) clickedButton.classList.add('selected');
+
+        // Apply Font family class to body based on selection
+        if(lang === 'gr') {
+            document.body.classList.add('lang-gr');
+        } else {
+            document.body.classList.remove('lang-gr');
+        }
+        
+        // Refresh intro screen copy and show Start button
+        document.getElementById('intro-title').innerText = ui[selectedLang].introTitle;
+        document.getElementById('intro-badge').innerText = ui[selectedLang].introBadge;
+        document.getElementById('intro-subtitle').innerText = ui[selectedLang].introSubtitle;
+
+        const startBtn = document.getElementById('start-btn');
+        startBtn.style.display = 'block';
+        startBtn.innerText = capsLabel(ui[selectedLang].enterBtn);
+    }
+
+    function enterGame() {
+        // Set active arrays based on language
+        if (selectedLang === 'gr') {
+            activeTruths = truthsGr;
+            activeDares = daresGr;
+        } else {
+            activeTruths = truthsEn;
+            activeDares = daresEn;
+        }
+
+        // Apply UI text
+        document.getElementById('game-title').innerText = ui[selectedLang].title;
+        document.getElementById('game-subtitle').innerText = ui[selectedLang].subtitle;
+        document.getElementById('wheel-step-label').innerText = ui[selectedLang].wheelStep;
+        document.getElementById('board-step-label').innerText = ui[selectedLang].boardStep;
+        document.getElementById('spin-btn').innerText = capsLabel(ui[selectedLang].spinBtn);
+        document.getElementById('student-display').innerText = `${ui[selectedLang].studentNumPrefix} ?`;
+        document.getElementById('btn-truth').innerText = ui[selectedLang].truthBtn;
+        document.getElementById('btn-dare').innerText = ui[selectedLang].dareBtn;
+        document.getElementById('modal-close-btn').innerText = ui[selectedLang].completeBtn;
+
+        // Switch screens
+        document.getElementById('intro-page').style.display = 'none';
+        document.getElementById('game-page').style.display = 'block';
+        
+        // Show Home button on game page
+        document.getElementById('home-btn').style.display = 'flex';
+        
+        // Initialize Wheel & Board
+        initWheel();
+        initBoard();
+        setMode('Truth');
+    }
+
+    function goHome() {
+        // Confirmation dialog to prevent accidental resets
+        if (confirm(ui[selectedLang].homeConfirm)) {
+            document.getElementById('game-page').style.display = 'none';
+            document.getElementById('home-btn').style.display = 'none';
+            document.getElementById('intro-page').style.display = 'flex';
+            
+            // Optionally, we reset the Start button selection
+            document.getElementById('start-btn').style.display = 'none';
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('selected'));
+        }
+    }
+
+    // --- Wheel Logic ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const centerX = 200, centerY = 200, radius = 180;
+
+    function initWheel() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < totalStudents; i++) {
+            const angle = (2 * Math.PI) / totalStudents;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, i * angle, (i + 1) * angle);
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+            
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#0f172a";
+            ctx.stroke();
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(i * angle + angle / 2);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 13px sans-serif";
+            ctx.fillText(i + 1, radius - 35, 5);
+            ctx.restore();
+        }
+    }
+
+    function spinWheel() {
+        const btn = document.getElementById('spin-btn');
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        document.body.classList.add('spinning');
+        const studentDisplay = document.getElementById('student-display');
+        studentDisplay.classList.remove('result-pop');
+        studentDisplay.innerText = ui[selectedLang].spinningTxt;
+
+        // Play the wheel spinning sound
+        const spinAudio = document.getElementById('spin-audio');
+        spinAudio.currentTime = 0;
+        spinAudio.play().catch(err => console.log("Audio autoplay prevented by browser.", err));
+
+        const randomDegree = Math.floor(Math.random() * 360) + 3600; 
+        canvas.style.transform = `rotate(${randomDegree}deg)`;
+        
+        setTimeout(() => {
+            const actualDegree = randomDegree % 360;
+            const pointerAngleOnCanvas = (270 - actualDegree + 360) % 360;
+            const degreesPerSlice = 360 / totalStudents;
+            const sliceIndex = Math.floor(pointerAngleOnCanvas / degreesPerSlice);
+            const studentNum = sliceIndex + 1;
+            
+            studentDisplay.innerText = `${ui[selectedLang].studentNumPrefix} ${studentNum}`;
+            studentDisplay.classList.add('result-pop');
+            document.body.classList.remove('spinning');
+            launchConfetti(18);
+            
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        }, 4000);
+    }
+
+    // --- Board Logic ---
+    function initBoard() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = ''; 
+        for (let i = 1; i <= 30; i++) {
+            const sq = document.createElement('div');
+            sq.className = 'square';
+            sq.style.animationDelay = `${i * 0.018}s`;
+            sq.innerText = i;
+            sq.onclick = function() {
+                if (!this.classList.contains('used')) {
+                    showChallenge(i - 1, this);
+                }
+            };
+            grid.appendChild(sq);
+        }
+        updateProgress();
+    }
+
+
+
+    function updateProgress() {
+        const opened = document.querySelectorAll('.square.used').length;
+        const progress = document.getElementById('progress-pill');
+        if (progress) {
+            progress.innerText = `${opened}/30 ${ui[selectedLang].progressTxt}`;
+        }
+    }
+
+    function launchConfetti(amount = 36) {
+        const layer = document.getElementById('confetti-layer');
+        if (!layer) return;
+        const palette = ['#ff3d71', '#00e5ff', '#ffe66d', '#8cff66', '#ff9f1c', '#a855f7'];
+        for (let i = 0; i < amount; i++) {
+            const piece = document.createElement('span');
+            piece.className = 'confetti';
+            piece.style.left = `${Math.random() * 100}%`;
+            piece.style.background = palette[Math.floor(Math.random() * palette.length)];
+            piece.style.animationDelay = `${Math.random() * 0.35}s`;
+            piece.style.animationDuration = `${1.2 + Math.random() * 1.1}s`;
+            piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+            layer.appendChild(piece);
+            setTimeout(() => piece.remove(), 2600);
+        }
+    }
+
+    function launchMiniBurst(originElement) {
+        if (!originElement) return;
+        const emojis = ['✨', '🔥', '🎉', '⚡', '🎲'];
+        const rect = originElement.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        for (let i = 0; i < 8; i++) {
+            const burst = document.createElement('span');
+            burst.className = 'mini-burst';
+            burst.textContent = emojis[i % emojis.length];
+            burst.style.left = `${x}px`;
+            burst.style.top = `${y}px`;
+            burst.style.setProperty('--dx', `${(Math.random() - 0.5) * 180}px`);
+            burst.style.setProperty('--dy', `${-50 - Math.random() * 130}px`);
+            document.body.appendChild(burst);
+            setTimeout(() => burst.remove(), 950);
+        }
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn-truth').classList.toggle('active', mode === 'Truth');
+        document.getElementById('btn-dare').classList.toggle('active', mode === 'Dare');
+        
+        const typeEl = document.getElementById('challenge-type');
+        typeEl.style.color = mode === 'Truth' ? 'var(--accent)' : 'var(--primary)';
+        typeEl.innerText = capsLabel(mode === 'Truth' ? ui[selectedLang].truthBtn : ui[selectedLang].dareBtn);
+    }
+
+    function showChallenge(index, element) {
+        // 1. Play the audio FIRST
+        const audio = document.getElementById('card-audio');
+        audio.currentTime = 0; 
+        audio.play().catch(err => console.log("Audio autoplay prevented by browser.", err));
+
+        // 2. Set the text behind the scenes
+        const text = (currentMode === 'Truth') ? activeTruths[index] : activeDares[index];
+        document.getElementById('challenge-type').innerText = capsLabel(currentMode === 'Truth' ? ui[selectedLang].truthBtn : ui[selectedLang].dareBtn);
+        document.getElementById('challenge-text').innerText = text;
+        
+        // 3. Mark the square as used 
+        element.classList.add('used', 'pop-used');
+        launchMiniBurst(element);
+        updateProgress();
+        setTimeout(() => element.classList.remove('pop-used'), 650);
+
+        // 4. Delay the 3D visual flip so the audio takes center stage first (1-second delay)
+        setTimeout(() => {
+            document.getElementById('modal').style.display = 'flex';
+            launchConfetti(42);
+        }, 1000); 
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+        launchConfetti(14);
+    }
+</script>
+</body>
+</html>
